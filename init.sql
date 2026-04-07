@@ -10,5 +10,6 @@ INSERT INTO tasks (name, status) VALUES
     ('Write report',  'pending'),
     ('Read book',     'done'),
     ('Clean house',   'pending'),
-    ('Call mom',      'done')
+    ('Call mom',      'done'),
+    ('Tea',           'pending')
 ON CONFLICT DO NOTHING;
