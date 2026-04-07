@@ -1,0 +1,40 @@
+# docker-compose.yml  (place at root of lab8-cicd repo)
+version: '3.9'
+
+services:
+
+  app:
+    build: .                              # Build from local Dockerfile
+    image: mohamedsalah30/lab6-app:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=db                        # 'db' = the service name below
+      - DB_PORT=5432
+      - DB_NAME=lab6db
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+      - MODE=compose
+    depends_on:
+      db:
+        condition: service_healthy        # Wait until Postgres passes healthcheck
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER:     postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB:       lab6db
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql   # Seeds on first start
+      - pgdata:/var/lib/postgresql/data                    # Persists data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d lab6db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  pgdata:
